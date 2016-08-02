@@ -1,0 +1,99 @@
+<?php
+
+function mconnect_schema(){
+  $schema['mconnect_data'] = array(
+    'description' => t('Feeds Data'),
+    'fields' => array(
+      'id' => array(
+        'description' => t('The primary identifier for the feeds data'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => t('User uid'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'provider' => array(
+        'description' => t('Twitter, Facebook, Instagram etc'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'feed_id' => array(
+        'description' => t('Feed id'),
+        'type' => 'varchar',
+        'length' => 100,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'cron_date' => array(
+        'type' => 'date',
+        'mysql_type' => 'date',
+      ),
+      'data' => array(
+        'description' => t('Feed Data'),
+         'type' => 'text',
+         'size' => 'big',
+         'not null' => TRUE
+      ),
+      'created' => array(
+        'description' => t('Feed created'),
+         'type' => 'int',
+         'unsigned' => TRUE,
+         'not null' => TRUE,
+         'default' => 0,
+      ),
+      'updated' => array(
+        'description' => t('Feed updated'),
+         'type' => 'int',
+         'unsigned' => TRUE,
+         'not null' => TRUE,
+         'default' => 0,
+      ),
+    ),
+    'primary key' => array('id'),
+    'unique keys' => array(
+      'group_member' => array('cron_date', 'feed_id'),
+    ),
+  );
+
+   $schema['mconnect_tag'] = array(
+    'description' => t('Feeds Data'),
+    'fields' => array(
+      'tid' => array(
+        'description' => t('The primary identifier for the tag data'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'feed_id' => array(
+        'description' => t('Feed id'),
+        'type' => 'varchar',
+        'length' => 100,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'tag' => array(
+        'description' => t('Tag Name'),
+        'type' => 'varchar',
+        'length' => 100,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('tid'),
+    'unique keys' => array(
+      'group_member' => array('feed_id', 'tag'),
+    ),
+  );
+
+ return $schema;
+
+}
+
+?>

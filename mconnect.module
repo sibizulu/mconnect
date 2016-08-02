@@ -1,0 +1,187 @@
+<?php
+
+/**
+ * Implements hook_permission().
+ */
+function mconnect_permission() {
+  return array(
+    'mconnect admin' =>  array(
+      'title' => t('Mconnect Admin'),
+      'description' => t('Perform administration tasks for mconnect.'),
+    ),
+    'mconnect client' =>  array(
+      'title' => t('Mconnect client'),
+      'description' => t('Perform client tasks for mconnect.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function mconnect_menu() {
+
+  $items['user/%user/integrations'] = array(
+    'title' => 'Integrations',
+    'page callback' => 'light_misc_integrations',
+    'page arguments' => array(1),
+    'access callback' => 'user_edit_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK
+  );
+  $items['mconnect/testme'] = array(
+    'title' => 'Test Me',
+    'page callback' => 'light_misc_test_me',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Adding feed row to DB `mconnect_data`.
+ */
+function mconnect_data_push($data){
+  $table  = "feed_data";
+  $record = (array) $data;
+  drupal_write_record ($table, $record);
+}
+
+/**
+ * Adding feed tag row to DB `mconnect_tag`.
+ */
+function mconnect_tag_push($data){
+  $table  = "feed_tag";
+  $record = (array) $data;
+  drupal_write_record ($table, $record);
+}
+
+/**
+ * Font Awesome icon configuration.
+ */
+function light_misc_fa_icon(){
+  return array(
+    'Facebook' => 'fa-facebook-official',
+    'Twitter' => 'fa-twitter-square',
+    'Instagram' => 'fa-instagram',
+    'default' => 'fa-connectdevelop'
+  );
+}
+
+/**
+ * Custom function for hybridauth integration.
+ */
+function light_misc_integrations($account){
+
+  global $user;
+  drupal_set_title("Integrations");
+  $build = array();
+  $icons = light_misc_fa_icon();
+
+  if (module_exists('hybridauth')) {
+
+  $identities = _hybridauth_identity_load_by_uid($account->uid);
+  $providers = hybridauth_providers_list();
+  $providers_enabled = hybridauth_get_enabled_providers();
+
+  $header = array(t('Provider'), t('Status'), t('Action'));
+  $rows = array();
+  $data_array = array();
+  $connected = array();
+
+  foreach ($identities as $identity) {
+    $data = unserialize($identity['data']);
+    $data_array[] = $data;
+    $connect_icon = isset($icons[$data['provider']]) ? $icons[$data['provider']] : $icons['default'];
+     $rows[] = array(
+      '<span class="btn btn-default btn-socialm"><i class="fa '.$connect_icon.'" aria-hidden="true"></i> '.$providers[$data['provider']].'</span>',
+      t('Connected'),
+      l(t('Delete'), 'user/' . $account->uid . '/hybridauth/delete/' . $identity['id']),
+    );
+    $connected[$providers[$data['provider']]] = $providers[$data['provider']];
+  }
+
+  foreach ($providers_enabled as $identity) {
+   if(!isset($connected[$identity])) {
+   $connect_icon = isset($icons[$identity]) ? $icons[$identity] : $icons['default'];
+    $rows[] = array(
+      l('<i class="fa '.$connect_icon.'" aria-hidden="true"></i> '.$identity,"hybridauth/window/" . $identity,
+           array('html' => TRUE,'attributes' => array('class' => 'btn btn-default btn-socialm'),"query" => array("destination" => $_GET['q'],"destination_error" => $_GET['q']))),
+      t('Not connected'),
+      '-',
+    );
+    }
+  }
+
+  $build['identity'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#sticky' => FALSE,
+    '#empty' => t("You don't have any identities yet."),
+  );
+
+  if (variable_get('hybridauth_debug', 0)) {
+    $connected_providers = hybridauth_get_connected_providers();
+    $build['connected_providers'] = array(
+      '#markup' => t('Currently connected to (session data):') . ' ' . implode(', ', $connected_providers),
+      '#weight' => 15,
+    );
+  }
+
+  // Tokens browser for admins.
+  if (user_access('administer site configuration') || user_access('administer users')) {
+    $build['vtabs'] = array(
+      '#type' => 'vertical_tabs',
+      '#weight' => 20,
+    );
+
+    $header = array(t('Token'), t('Value'));
+    // User tokens.
+    if (!empty($account->data['hybridauth'])) {
+      $build['vtabs']['fset_user_tokens'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('User tokens'),
+      );
+
+      $rows = array();
+      foreach ($account->data['hybridauth'] as $key => $value) {
+        $rows[] = array('[user:hybridauth:' . $key . ']', $value);
+      }
+      $build['vtabs']['fset_user_tokens']['tokens'] = array(
+        '#theme' => 'table',
+        '#header' => $header,
+        '#rows' => $rows,
+        '#sticky' => FALSE,
+      );
+    }
+
+    // Data from auth providers.
+    foreach ($data_array as $data) {
+      $build['vtabs']['fset_' . $data['provider'] . '_' . $data['identifier']] = array(
+        '#type' => 'fieldset',
+        '#title' => $providers[$data['provider']],
+      );
+
+      $rows = array();
+      foreach ($data as $key => $value) {
+        $rows[] = array($key, $value);
+      }
+      $build['vtabs']['fset_' . $data['provider'] . '_' . $data['identifier']]['tokens'] = array(
+        '#theme' => 'table',
+        '#header' => $header,
+        '#rows' => $rows,
+        '#sticky' => FALSE,
+      );
+    }
+  }
+
+  }
+  return $build;
+}
+
+function light_misc_test_me(){
+  light_misc_load_by_tag("joke");
+  return "";
+}

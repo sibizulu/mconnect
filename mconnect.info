@@ -1,0 +1,4 @@
+name = Multiple Social Connect
+description = Integration with hybridauth and feed fetching
+package = "light"
+core = 7.x
