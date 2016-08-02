@@ -4,3 +4,4 @@ package = "light"
 core = 7.x
 
 dependencies[] = hybridauth
+dependencies[] = views
