@@ -11,7 +11,7 @@ function mconnect_views_data()
 
   $data['mconnect_data']['table']['group'] = t('Mconnect');
   $data['mconnect_data']['table']['base'] = array(
-      'field' => 'feed_id',
+      'field' => 'uid',
       'title' => t('Mconnect'),
       'help' => t('Contains rows of feeds.'),
   );
@@ -42,13 +42,13 @@ function mconnect_views_data()
     'title' => t('User ID'),
     'help' => t('References to a user.'),
     'relationship' => array(
-      'base' => 'user', // The name of the table to join with.
+      'base' => 'users', // The name of the table to join with.
       'base field' => 'uid', // The name of the field on the joined table.
       // 'field' => 'nid' -- see hook_views_data_alter(); not needed here.
       'handler' => 'views_handler_relationship',
-      'label' => t('Default label for the relationship'),
-      'title' => t('Title shown when adding the relationship'),
-      'help' => t('More information on this relationship'),
+      'label' => t('User relationship'),
+      'label' => t('User relationship'),
+      'label' => t('User relationship'),
     ),
   );
 
@@ -96,17 +96,10 @@ function mconnect_views_data()
   );
 
   $data['mconnect_data']['cron_date'] = array(
-    'title' => t('Cron date field'),
+    'title' => t('Cron Date'),
     'field' => array(
-      'handler' => 'views_handler_field_date',
-      'click sortable' => TRUE,
-    ),
-    'sort' => array(
-      'handler' => 'views_handler_sort_date',
-    ),
-    'filter' => array(
-      'handler' => 'views_handler_filter_date',
-    ),
+      'handler' => 'views_handler_field',
+    )
   );
 
   $data['mconnect_data']['created'] = array(
