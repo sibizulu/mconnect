@@ -90,6 +90,7 @@ function mconnect_views_data()
 
   $data['mconnect_data']['data'] = array(
     'title' => t('Feed Data'),
+    'help' => t('Feed Data.'),
     'field' => array(
       'handler' => 'views_handler_field',
     )
@@ -97,6 +98,7 @@ function mconnect_views_data()
 
   $data['mconnect_data']['cron_date'] = array(
     'title' => t('Cron Date'),
+    'help' => t('Cron Date.'),
     'field' => array(
       'handler' => 'views_handler_field',
     )
@@ -104,6 +106,7 @@ function mconnect_views_data()
 
   $data['mconnect_data']['created'] = array(
     'title' => t('Created Date'),
+    'help' => t('Created Date.'),
     'field' => array(
       'handler' => 'views_handler_field_date',
       'click sortable' => TRUE,
@@ -118,6 +121,7 @@ function mconnect_views_data()
 
   $data['mconnect_data']['updated'] = array(
     'title' => t('Updated Date'),
+    'help' => t('Updated Date.'),
     'field' => array(
       'handler' => 'views_handler_field_date',
       'click sortable' => TRUE,
@@ -131,8 +135,46 @@ function mconnect_views_data()
   );
 
 
+  $data['mconnect_tag']['table']['group'] = t('Mconnect');
+  $data['mconnect_tag']['table']['join'] = array(
+     // Directly links to node table.
+    'mconnect_data' => array(
+      'table' => 'mconnect_tag',
+      'left_field' => 'feed_id',
+      'field' => 'feed_id'
+    ),
+  );
+  $data['mconnect_data']['tid'] = array(
+    'title' => t('Tag ID'),
+    'help' => t('The record ID.'),
+    'field' => array(
+        'handler' => 'views_handler_field_numeric',
+    ),
+    'sort' => array(
+        'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+    ),
+  );
 
-
+  $data['mconnect_tag']['tag'] = array(
+    'title' => t('Tag name'),
+    'help' => t('Tag name.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE, // This is use by the table display plugin.
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
 
   return $data;
 
