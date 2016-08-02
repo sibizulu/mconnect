@@ -25,13 +25,12 @@ function mconnect_menu() {
     'title' => 'Integrations',
     'page callback' => 'light_misc_integrations',
     'page arguments' => array(1),
-    'access callback' => 'user_edit_access',
-    'access arguments' => array(1),
+    'access arguments' => array('Mconnect client'),
     'type' => MENU_LOCAL_TASK
   );
   $items['mconnect/testme'] = array(
     'title' => 'Test Me',
-    'page callback' => 'light_misc_test_me',
+    'page callback' => 'mconnect_test_me',
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -185,15 +184,17 @@ function light_misc_integrations($account){
 /**
  * Implements hook_views_api().
  */
-function expose_views_api()
+function mconnect_views_api()
 {
     return array(
         'api' => 3,
-        'path' => drupal_get_path('module', 'expose') . '/includes/views',
+        'path' => drupal_get_path('module', 'mconnect') . '/includes/views',
     );
 }
 
-function light_misc_test_me(){
-  light_misc_load_by_tag("joke");
+/**
+ * Test function to implement something
+ */
+function mconnect_test_me(){
   return "";
 }
